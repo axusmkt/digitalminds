@@ -1,0 +1,253 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function isValidWorkspace(data, workspaceId) {
+      return data.keys().hasAll(['id', 'name', 'ownerId', 'members', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['id', 'name', 'icon', 'ownerId', 'members', 'memberDetails', 'createdAt', 'updatedAt'])
+        && data.id == workspaceId
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 150
+        && data.ownerId is string && data.ownerId.size() >= 1 && data.ownerId.size() <= 128
+        && data.members is list && data.members.size() <= 100
+        && data.createdAt is string && data.createdAt.size() <= 64
+        && data.updatedAt is string && data.updatedAt.size() <= 64;
+    }
+
+    function isValidPage(data, pageId) {
+      return data.keys().hasAll(['id', 'workspaceId', 'title', 'blocks', 'createdBy', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly([
+          'id', 'workspaceId', 'parentId', 'title', 'icon', 'coverImage',
+          'isFavorite', 'isArchived', 'isShared', 'sharedRole', 'blocks',
+          'createdBy', 'createdAt', 'updatedAt', 'deletedAt', 'deletedBy'
+        ])
+        && data.id == pageId
+        && data.workspaceId is string && data.workspaceId.size() >= 1 && data.workspaceId.size() <= 128
+        && data.title is string && data.title.size() <= 500
+        && data.blocks is list && data.blocks.size() <= 1000
+        && data.createdBy is string && data.createdBy.size() <= 128
+        && data.createdAt is string && data.createdAt.size() <= 64
+        && data.updatedAt is string && data.updatedAt.size() <= 64;
+    }
+
+    function isValidTask(data, taskId) {
+      return data.keys().hasAll(['id', 'workspaceId', 'title', 'status', 'priority', 'createdBy', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly([
+          'id', 'workspaceId', 'title', 'description', 'status', 'priority',
+          'dueDate', 'startDate', 'completedAt', 'projectId', 'pageId',
+          'assigneeId', 'subtasks', 'tags', 'estimatedMinutes', 'timeSpentMinutes',
+          'time', 'itemType', 'createdBy', 'createdAt', 'updatedAt', 'deletedAt'
+        ])
+        && data.id == taskId
+        && data.workspaceId is string && data.workspaceId.size() >= 1 && data.workspaceId.size() <= 128
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 500
+        && data.status in ['todo', 'in_progress', 'done', 'archived']
+        && data.priority in ['low', 'medium', 'high', 'urgent']
+        && data.createdBy is string && data.createdBy.size() <= 128
+        && data.createdAt is string && data.createdAt.size() <= 64
+        && data.updatedAt is string && data.updatedAt.size() <= 64;
+    }
+
+    function isValidProject(data, projectId) {
+      return data.keys().hasAll(['id', 'workspaceId', 'name', 'status', 'priority', 'ownerId', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly([
+          'id', 'workspaceId', 'name', 'description', 'icon', 'color',
+          'status', 'priority', 'startDate', 'targetDate', 'ownerId',
+          'tags', 'milestones', 'createdAt', 'updatedAt', 'deletedAt'
+        ])
+        && data.id == projectId
+        && data.workspaceId is string && data.workspaceId.size() >= 1 && data.workspaceId.size() <= 128
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 300
+        && data.status in ['planned', 'in_progress', 'paused', 'completed', 'cancelled']
+        && data.priority in ['low', 'medium', 'high', 'urgent']
+        && data.ownerId is string && data.ownerId.size() <= 128
+        && data.createdAt is string && data.createdAt.size() <= 64
+        && data.updatedAt is string && data.updatedAt.size() <= 64;
+    }
+
+    function isValidDatabase(data, databaseId) {
+      return data.keys().hasAll(['id', 'workspaceId', 'name', 'properties', 'views', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly([
+          'id', 'workspaceId', 'name', 'description', 'icon',
+          'properties', 'views', 'createdAt', 'updatedAt'
+        ])
+        && data.id == databaseId
+        && data.workspaceId is string && data.workspaceId.size() >= 1 && data.workspaceId.size() <= 128
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 300
+        && data.properties is list && data.properties.size() <= 100
+        && data.views is list && data.views.size() <= 50
+        && data.createdAt is string && data.createdAt.size() <= 64
+        && data.updatedAt is string && data.updatedAt.size() <= 64;
+    }
+
+    function isValidDatabaseRecord(data, recordId) {
+      return data.keys().hasAll(['id', 'databaseId', 'workspaceId', 'title', 'values', 'createdBy', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly([
+          'id', 'databaseId', 'workspaceId', 'title', 'values',
+          'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && data.id == recordId
+        && data.databaseId is string && data.databaseId.size() >= 1 && data.databaseId.size() <= 128
+        && data.workspaceId is string && data.workspaceId.size() >= 1 && data.workspaceId.size() <= 128
+        && data.title is string && data.title.size() <= 500
+        && data.values is map
+        && data.createdBy is string && data.createdBy.size() <= 128
+        && data.createdAt is string && data.createdAt.size() <= 64
+        && data.updatedAt is string && data.updatedAt.size() <= 64;
+    }
+
+    function isValidGoal(data, goalId) {
+      return data.keys().hasAll(['id', 'workspaceId', 'title', 'targetValue', 'currentValue', 'status', 'createdBy', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly([
+          'id', 'workspaceId', 'title', 'description', 'category',
+          'startDate', 'targetDate', 'currentValue', 'targetValue',
+          'metric', 'status', 'relatedTaskIds', 'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && data.id == goalId
+        && data.workspaceId is string && data.workspaceId.size() >= 1 && data.workspaceId.size() <= 128
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 300
+        && data.status in ['not_started', 'in_progress', 'achieved', 'paused']
+        && data.createdBy is string && data.createdBy.size() <= 128
+        && data.createdAt is string && data.createdAt.size() <= 64
+        && data.updatedAt is string && data.updatedAt.size() <= 64;
+    }
+
+    function isValidHabit(data, habitId) {
+      return data.keys().hasAll(['id', 'workspaceId', 'title', 'frequency', 'streak', 'createdBy', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly([
+          'id', 'workspaceId', 'title', 'description', 'frequency',
+          'targetDays', 'icon', 'color', 'streak', 'paused',
+          'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && data.id == habitId
+        && data.workspaceId is string && data.workspaceId.size() >= 1 && data.workspaceId.size() <= 128
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 300
+        && data.frequency in ['daily', 'weekly']
+        && data.createdBy is string && data.createdBy.size() <= 128
+        && data.createdAt is string && data.createdAt.size() <= 64
+        && data.updatedAt is string && data.updatedAt.size() <= 64;
+    }
+
+    function isValidHabitEntry(data, entryId) {
+      return data.keys().hasAll(['id', 'habitId', 'workspaceId', 'date', 'completed', 'userId'])
+        && data.keys().hasOnly([
+          'id', 'habitId', 'workspaceId', 'date', 'completed', 'completedAt', 'userId'
+        ])
+        && data.id == entryId
+        && data.habitId is string && data.habitId.size() >= 1 && data.habitId.size() <= 128
+        && data.workspaceId is string && data.workspaceId.size() >= 1 && data.workspaceId.size() <= 128
+        && data.date is string && data.date.size() <= 32
+        && data.completed is bool
+        && data.userId is string && data.userId.size() <= 128;
+    }
+
+    function isValidNote(data, noteId) {
+      return data.keys().hasAll(['id', 'workspaceId', 'title', 'content', 'createdBy', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly([
+          'id', 'workspaceId', 'title', 'content', 'tags', 'isPinned',
+          'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && data.id == noteId
+        && data.workspaceId is string && data.workspaceId.size() >= 1 && data.workspaceId.size() <= 128
+        && data.title is string && data.title.size() <= 300
+        && data.content is string && data.content.size() <= 20000
+        && data.createdBy is string && data.createdBy.size() <= 128
+        && data.createdAt is string && data.createdAt.size() <= 64
+        && data.updatedAt is string && data.updatedAt.size() <= 64;
+    }
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Connection health check
+    match /test/{docId} {
+      allow get: if isValidId(docId);
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(userId)
+        && incoming().email is string && incoming().email.size() <= 320;
+      allow delete: if isValidId(userId);
+    }
+
+    // Workspaces collection
+    match /workspaces/{workspaceId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(workspaceId) && isValidWorkspace(incoming(), workspaceId);
+      allow delete: if isValidId(workspaceId);
+    }
+
+    // Pages collection
+    match /pages/{pageId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(pageId) && isValidPage(incoming(), pageId);
+      allow delete: if isValidId(pageId);
+    }
+
+    // Tasks collection
+    match /tasks/{taskId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(taskId) && isValidTask(incoming(), taskId);
+      allow delete: if isValidId(taskId);
+    }
+
+    // Projects collection
+    match /projects/{projectId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(projectId) && isValidProject(incoming(), projectId);
+      allow delete: if isValidId(projectId);
+    }
+
+    // Databases collection
+    match /databases/{databaseId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(databaseId) && isValidDatabase(incoming(), databaseId);
+      allow delete: if isValidId(databaseId);
+    }
+
+    // Database Records collection
+    match /databaseRecords/{recordId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(recordId) && isValidDatabaseRecord(incoming(), recordId);
+      allow delete: if isValidId(recordId);
+    }
+
+    // Goals collection
+    match /goals/{goalId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(goalId) && isValidGoal(incoming(), goalId);
+      allow delete: if isValidId(goalId);
+    }
+
+    // Habits collection
+    match /habits/{habitId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(habitId) && isValidHabit(incoming(), habitId);
+      allow delete: if isValidId(habitId);
+    }
+
+    // Habit Entries collection
+    match /habitEntries/{entryId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(entryId) && isValidHabitEntry(incoming(), entryId);
+      allow delete: if isValidId(entryId);
+    }
+
+    // Quick Notes collection
+    match /notes/{noteId} {
+      allow get, list: if true;
+      allow create, update: if isValidId(noteId) && isValidNote(incoming(), noteId);
+      allow delete: if isValidId(noteId);
+    }
+  }
+}

@@ -1,0 +1,251 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Represents an authenticated user profile",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "email", "displayName"]
+    },
+    "Workspace": {
+      "title": "Workspace",
+      "description": "Workspace root container",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "maxLength": 100 },
+        "icon": { "type": "string", "maxLength": 20 },
+        "ownerId": { "type": "string" },
+        "members": { "type": "array" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "ownerId"]
+    },
+    "Page": {
+      "title": "Page Document",
+      "description": "Hierarchical document containing block elements",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "workspaceId": { "type": "string" },
+        "parentId": { "type": "string" },
+        "title": { "type": "string", "maxLength": 200 },
+        "icon": { "type": "string" },
+        "coverImage": { "type": "string" },
+        "isFavorite": { "type": "boolean" },
+        "isArchived": { "type": "boolean" },
+        "isShared": { "type": "boolean" },
+        "blocks": { "type": "array" },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "workspaceId", "title", "createdBy"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "Actionable task item with status and priority",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "workspaceId": { "type": "string" },
+        "title": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["todo", "in_progress", "done", "archived"] },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "urgent"] },
+        "dueDate": { "type": "string" },
+        "projectId": { "type": "string" },
+        "pageId": { "type": "string" },
+        "assigneeId": { "type": "string" },
+        "subtasks": { "type": "array" },
+        "tags": { "type": "array" },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "workspaceId", "title", "status", "priority", "createdBy"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "Project containing goals, tasks, and timelines",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "workspaceId": { "type": "string" },
+        "name": { "type": "string", "maxLength": 150 },
+        "description": { "type": "string" },
+        "icon": { "type": "string" },
+        "color": { "type": "string" },
+        "status": { "type": "string", "enum": ["planned", "in_progress", "paused", "completed", "cancelled"] },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "urgent"] },
+        "startDate": { "type": "string" },
+        "targetDate": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "workspaceId", "name", "status", "ownerId"]
+    },
+    "Database": {
+      "title": "Database",
+      "description": "Flexible Notion-like database schema",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "workspaceId": { "type": "string" },
+        "name": { "type": "string", "maxLength": 150 },
+        "description": { "type": "string" },
+        "icon": { "type": "string" },
+        "properties": { "type": "array" },
+        "views": { "type": "array" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "workspaceId", "name"]
+    },
+    "DatabaseRecord": {
+      "title": "Database Record",
+      "description": "Item stored in a flexible database",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "databaseId": { "type": "string" },
+        "workspaceId": { "type": "string" },
+        "title": { "type": "string" },
+        "values": { "type": "object" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "createdBy": { "type": "string" }
+      },
+      "required": ["id", "databaseId", "workspaceId", "title", "createdBy"]
+    },
+    "Goal": {
+      "title": "Goal",
+      "description": "Trackable objective with target values and milestones",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "workspaceId": { "type": "string" },
+        "title": { "type": "string", "maxLength": 150 },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "startDate": { "type": "string" },
+        "targetDate": { "type": "string" },
+        "currentValue": { "type": "number" },
+        "targetValue": { "type": "number" },
+        "metric": { "type": "string" },
+        "status": { "type": "string", "enum": ["not_started", "in_progress", "achieved", "paused"] },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "workspaceId", "title", "status", "createdBy"]
+    },
+    "Habit": {
+      "title": "Habit",
+      "description": "Recurring daily or weekly routine to track",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "workspaceId": { "type": "string" },
+        "title": { "type": "string", "maxLength": 100 },
+        "frequency": { "type": "string", "enum": ["daily", "weekly"] },
+        "targetDays": { "type": "array" },
+        "icon": { "type": "string" },
+        "color": { "type": "string" },
+        "streak": { "type": "number" },
+        "paused": { "type": "boolean" },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "workspaceId", "title", "createdBy"]
+    },
+    "HabitEntry": {
+      "title": "Habit Log Entry",
+      "description": "Single completion timestamp for a habit",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "habitId": { "type": "string" },
+        "workspaceId": { "type": "string" },
+        "date": { "type": "string" },
+        "completed": { "type": "boolean" },
+        "completedAt": { "type": "string" },
+        "userId": { "type": "string" }
+      },
+      "required": ["id", "habitId", "workspaceId", "date", "userId"]
+    },
+    "Note": {
+      "title": "Quick Note",
+      "description": "Quick captured thought, idea or memo",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "workspaceId": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "tags": { "type": "array" },
+        "isPinned": { "type": "boolean" },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "workspaceId", "createdBy"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile document"
+    },
+    "/workspaces/{workspaceId}": {
+      "schema": "Workspace",
+      "description": "Workspace root document"
+    },
+    "/pages/{pageId}": {
+      "schema": "Page",
+      "description": "Block-based hierarchical pages"
+    },
+    "/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "Workspace task documents"
+    },
+    "/projects/{projectId}": {
+      "schema": "Project",
+      "description": "Workspace projects"
+    },
+    "/databases/{databaseId}": {
+      "schema": "Database",
+      "description": "Notion-style custom databases"
+    },
+    "/databaseRecords/{recordId}": {
+      "schema": "DatabaseRecord",
+      "description": "Individual items in custom databases"
+    },
+    "/goals/{goalId}": {
+      "schema": "Goal",
+      "description": "Goal documents"
+    },
+    "/habits/{habitId}": {
+      "schema": "Habit",
+      "description": "Habit trackers"
+    },
+    "/habitEntries/{entryId}": {
+      "schema": "HabitEntry",
+      "description": "Daily habit logs"
+    },
+    "/notes/{noteId}": {
+      "schema": "Note",
+      "description": "Quick capture notes"
+    }
+  }
+}

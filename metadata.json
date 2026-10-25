@@ -1,0 +1,8 @@
+{
+  "name": "Digital Minds - Planejamento",
+  "description": "Workspace integrado com documentos em blocos, gestão de tarefas e projetos, bases de dados flexíveis, calendário, metas e rotinas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
